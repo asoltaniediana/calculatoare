@@ -153,7 +153,6 @@
           <option value="2">Semestrial</option>
           <option value="4" selected>Trimestrial</option>
           <option value="12">Lunar</option>
-          <option value="365">Zilnic</option>
         </select>
 
         <label for="ani">Numar de ani:</label>
@@ -176,7 +175,6 @@
           <option value="2">Semestrial</option>
           <option value="4" selected>Trimestrial</option>
           <option value="12">Lunar</option>
-          <option value="365">Zilnic</option>
         </select>
 
         <button type="submit">Calculeaza</button>
@@ -246,31 +244,39 @@
         pmtFreq = 1,
         raportare = "anual"
       ) {
-        const rezultateLunare = [];
+        const rezultate = [];
         const luniTotale = Math.round(t * 12);
+
         let sumaInvestita = P;
         let valoareCont = P;
-        let intervalContributie = 12 / pmtFreq;
+
+        const intervalCompunere = 12 / n; // luni între compuneri dobândă
+        const intervalContributie = 12 / pmtFreq; // luni între contribuții
 
         for (let luna = 0; luna <= luniTotale; luna++) {
-          if (luna > 0) {
-            valoareCont += valoareCont * (r / 12);
-          }
+          // Adaugă contribuție doar la lunile corespunzătoare
           if (PMT > 0 && luna > 0 && luna % intervalContributie === 0) {
             valoareCont += PMT;
             sumaInvestita += PMT;
           }
-          rezultateLunare.push({ luna, valoare: valoareCont, sumaInvestita });
+
+          // Aplică dobânda doar la lunile corespunzătoare compunerii
+          if (luna > 0 && luna % intervalCompunere === 0) {
+            valoareCont += valoareCont * (r / n);
+          }
+
+          rezultate.push({ luna, valoare: valoareCont, sumaInvestita });
         }
 
+        // Pregătim rezultatele pentru afișare în funcție de raportare (anual sau lunar)
         const rezultateFinale = [];
+
         if (raportare === "anual") {
           const ani = Math.ceil(t);
           for (let an = 0; an <= ani; an++) {
             let lunaIndex = an * 12;
-            if (lunaIndex >= rezultateLunare.length)
-              lunaIndex = rezultateLunare.length - 1;
-            const val = rezultateLunare[lunaIndex];
+            if (lunaIndex >= rezultate.length) lunaIndex = rezultate.length - 1;
+            const val = rezultate[lunaIndex];
             rezultateFinale.push({
               perioada: an + " ani",
               sumaInvestita: val.sumaInvestita,
@@ -279,8 +285,8 @@
             });
           }
         } else {
-          for (let i = 0; i < rezultateLunare.length; i++) {
-            const val = rezultateLunare[i];
+          for (let i = 0; i < rezultate.length; i++) {
+            const val = rezultate[i];
             rezultateFinale.push({
               perioada: i + " luni",
               sumaInvestita: val.sumaInvestita,
@@ -289,6 +295,7 @@
             });
           }
         }
+
         return rezultateFinale;
       }
 
