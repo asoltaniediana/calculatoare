@@ -163,19 +163,19 @@
   </head>
   <body>
     <div class="calculator">
-      <h1>Calculator Investiții</h1>
+      <h1>Calculator Investitii</h1>
 
       <div class="row">
-        <label for="principal">Sumă inițială investită (RON):</label>
+        <label for="principal">Suma initiala investita (RON):</label>
         <input type="number" id="principal" min="0" value="0" />
 
-        <label for="aport">Aport lunar (RON):</label>
+        <label for="aport">Investitie lunara (RON):</label>
         <input type="number" id="aport" min="0" value="1000" />
 
         <label for="dobanda">Randament anual (%):</label>
         <input type="number" id="dobanda" step="0.01" value="7" />
 
-        <label for="ani">Durata investiției (ani):</label>
+        <label for="ani">Durata investitiei (ani):</label>
         <input type="number" id="ani" min="1" value="20" />
       </div>
 
@@ -185,11 +185,10 @@
     <div class="rezultate hidden" id="rezultate">
       <h2>Rezultate calcul</h2>
       <p>
-        <strong>Investiție totală:</strong> <span id="totalInvestit"></span> RON
+        <strong>Investitie totala:</strong> <span id="totalInvestit"></span> RON
       </p>
       <p>
-        <strong>Valoare la sfârșitul perioadei:</strong>
-        <span id="valoareFinala"></span> RON
+        <strong>Valoare finala:</strong> <span id="valoareFinala"></span> RON
       </p>
       <p><strong>Profit:</strong> <span id="profit"></span> RON</p>
     </div>
@@ -221,8 +220,7 @@
         let investitii = [P];
         let totaluri = [P];
         let luniLabels = [0];
-
-        let tabel = [["Luna", "Investiție totală", "Valoare totală"]];
+        let tabel = [["Luna", "Investitie totala", "Valoare totala"]];
 
         for (let luna = 1; luna <= luni; luna++) {
           total = total * (1 + rl) + A;
@@ -263,24 +261,24 @@
             labels: luniLabels,
             datasets: [
               {
-                label: "Investiție totală",
+                label: "Investitie totala",
                 data: investitii,
                 borderColor: "#faa61a",
                 backgroundColor: "rgba(250, 166, 26, 0.2)",
                 borderWidth: 2,
                 fill: false,
                 tension: 0.2,
-                pointRadius: 0, // fără puncte pe linie
+                pointRadius: 0,
               },
               {
-                label: "Valoare totală",
+                label: "Valoare totala",
                 data: totaluri,
                 borderColor: "#333",
                 backgroundColor: "rgba(51, 51, 51, 0.2)",
                 borderWidth: 2,
                 fill: false,
                 tension: 0.2,
-                pointRadius: 0, // fără puncte pe linie
+                pointRadius: 0,
               },
             ],
           },
@@ -314,7 +312,7 @@
         });
 
         let html =
-          "<table><thead><tr><th>Luna</th><th>Investiție totală (RON)</th><th>Valoare totală (RON)</th></tr></thead><tbody>";
+          "<table><thead><tr><th>Luna</th><th>Investitie totala (RON)</th><th>Valoare totala (RON)</th></tr></thead><tbody>";
         for (let i = 1; i < tabel.length; i++) {
           html += `<tr><td>${tabel[i][0]}</td><td>${parseFloat(
             tabel[i][1]
@@ -342,8 +340,8 @@
 
       document
         .getElementById("exportBtn")
-        .addEventListener("click", function () {
-          if (!window._tabelXLSX) return alert("Calculează mai întâi.");
+        ?.addEventListener("click", function () {
+          if (!window._tabelXLSX) return alert("Calculeaza mai intai.");
 
           const ws = XLSX.utils.aoa_to_sheet(window._tabelXLSX);
           const wb = XLSX.utils.book_new();
