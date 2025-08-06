@@ -20,28 +20,16 @@
         padding: 0;
       }
 
-      .calculator,
-      .rezultate,
-      .chartarea {
+      .calculator {
         max-width: 600px;
         margin: 20px auto;
         padding: 20px;
-        background: none; /* fără fundal alb */
-        border-radius: 0; /* fără colțuri rotunjite */
-        box-shadow: none; /* fără umbră */
       }
 
-      h1,
-      .rezultate h2 {
-        color: #1a1a1a;
-        font-size: 20px;
-        margin-bottom: 15px;
-      }
-
-      label {
+      .calculator label {
         display: block;
-        margin-top: 15px; /* spațiu deasupra label */
-        margin-bottom: 6px; /* spațiu între label și input */
+        margin-top: 16px;
+        margin-bottom: 4px;
         font-weight: 600;
         color: #333;
       }
@@ -59,20 +47,14 @@
       button {
         background-color: var(--btn-bg-color);
         color: #fff;
-        margin-top: 10px;
         border: none;
         cursor: pointer;
         transition: background-color 0.3s ease;
-
-        width: auto; /* lățime automată */
-        padding: 10px 20px; /* padding mai larg */
-        display: block;
-        margin-left: auto;
-        margin-right: auto; /* centrare orizontală */
         font-size: 16px;
-        border-radius: 4px;
-        font-family: "Source Sans Pro", sans-serif;
-        white-space: nowrap; /* să nu se rupă textul */
+        border-radius: 6px;
+        padding: 10px 20px;
+        margin: 20px auto 0;
+        display: block;
       }
 
       button:hover {
@@ -80,27 +62,31 @@
       }
 
       .rezultate {
-        background-color: #fffef7; /* fundal deschis */
-        border: 1px solid #f0e6c8; /* margine subtilă */
-        border-radius: 6px;
-        padding: 25px 20px;
-        box-shadow: 0 2px 6px rgba(250, 166, 26, 0.2);
-        color: #333;
+        max-width: 600px;
+        margin: 30px auto 10px;
+        padding: 0 20px;
+      }
+
+      .rezultate h2 {
+        color: #1a1a1a;
+        font-size: 20px;
+        margin-bottom: 12px;
+        text-align: center;
+        border-bottom: 2px solid #faa61a;
+        padding-bottom: 6px;
       }
 
       .rezultate p {
         font-size: 17px;
-        line-height: 1.5;
-        margin: 12px 0;
-        font-weight: 500;
-      }
-
-      .rezultate strong {
-        color: #faa61a;
+        color: #333;
+        margin: 8px 0;
+        text-align: center;
       }
 
       .chartarea {
-        position: relative;
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 0 20px;
       }
 
       canvas#grafica {
@@ -111,20 +97,29 @@
       }
 
       #desfasurator {
-        margin-top: 15px;
+        margin-top: 20px;
+        text-align: center;
       }
 
       #desfasurator button {
-        width: auto;
         display: inline-block;
-        padding: 8px 16px;
-        margin-right: 8px;
-        font-family: "Source Sans Pro", sans-serif;
+        padding: 10px 18px;
+        font-size: 15px;
+        font-weight: 500;
+        margin: 0 auto;
+        background-color: var(--btn-bg-color);
+        color: white;
+        border: none;
+        border-radius: 5px;
         cursor: pointer;
       }
 
+      #desfasurator button:hover {
+        background-color: var(--btn-bg-hover);
+      }
+
       #tabel {
-        margin-top: 15px;
+        margin-top: 20px;
         overflow-x: auto;
       }
 
@@ -157,10 +152,11 @@
           padding: 15px;
           margin: 10px;
         }
+
         input[type="number"],
         button {
           font-size: 14px;
-          padding: 8px 16px;
+          padding: 8px;
         }
       }
     </style>
