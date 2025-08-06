@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Calculator Credit Maxim</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --btn-bg-color: #faa61a;
+        --btn-bg-hover: #d48800;
+      }
+
+      body {
+        font-family: "Source Sans Pro", sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+
+      .calculator {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+      }
+
+      .calculator label {
+        display: block;
+        margin-top: 16px;
+        margin-bottom: 4px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      input[type="number"] {
+        width: 100%;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        box-sizing: border-box;
+        font-family: "Source Sans Pro", sans-serif;
+      }
+
+      button {
+        background-color: var(--btn-bg-color);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        font-size: 16px;
+        border-radius: 6px;
+        padding: 10px 20px;
+        margin: 20px auto 0;
+        display: block;
+      }
+
+      button:hover {
+        background-color: var(--btn-bg-hover);
+      }
+
+      .rezultate {
+        max-width: 600px;
+        margin: 30px auto 10px;
+        padding: 0 20px;
+      }
+
+      .rezultate h2 {
+        color: #1a1a1a;
+        font-size: 20px;
+        margin-bottom: 12px;
+        text-align: center;
+        border-bottom: 2px solid #faa61a;
+        padding-bottom: 6px;
+      }
+
+      .rezultate p {
+        font-size: 17px;
+        color: #333;
+        margin: 8px 0;
+        text-align: center;
+      }
+
+      @media (max-width: 480px) {
+        .calculator,
+        .rezultate {
+          padding: 15px;
+          margin: 10px;
+        }
+
+        input[type="number"],
+        button {
+          font-size: 14px;
+          padding: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calculator">
+      <h1
+        style="
+          text-align: center;
+          font-size: 24px;
+          margin-bottom: 20px;
+          color: #222;
+        "
+      >
+        Calculator Credit Maxim
+      </h1>
+
+      <label for="venit">Venit net lunar (RON):</label>
+      <input type="number" id="venit" min="0" />
+
+      <label for="cheltuieli">Cheltuieli lunare (RON):</label>
+      <input type="number" id="cheltuieli" min="0" />
+
+      <label for="grad">Grad maxim de indatorare (%):</label>
+      <input type="number" id="grad" min="0" max="100" value="50" />
+
+      <label for="dobanda">Dobanda anuala (%):</label>
+      <input type="number" id="dobanda" step="0.01" value="12" />
+
+      <label for="ani">Durata creditului (ani):</label>
+      <input type="number" id="ani" min="1" value="5" />
+
+      <button id="calcBtn">CALCULEAZA</button>
+    </div>
+
+    <div class="rezultate" id="rezultate" style="display: none">
+      <h2>Rezultate</h2>
+      <p id="rataMax"></p>
+      <p id="creditMax"></p>
+      <p id="rataLunara"></p>
+    </div>
+
+    <script>
+      document.getElementById("calcBtn").addEventListener("click", function () {
+        const venit = parseFloat(document.getElementById("venit").value) || 0;
+        const cheltuieli =
+          parseFloat(document.getElementById("cheltuieli").value) || 0;
+        const grad = parseFloat(document.getElementById("grad").value) / 100;
+        const dobanda =
+          parseFloat(document.getElementById("dobanda").value) / 100;
+        const ani = parseInt(document.getElementById("ani").value) || 1;
+
+        const disponibil = Math.max(0, venit - cheltuieli);
+        const rataMax = disponibil * grad;
+
+        const luni = ani * 12;
+        const r = dobanda / 12;
+
+        let factor = 0;
+        if (r > 0) {
+          factor = (r * Math.pow(1 + r, luni)) / (Math.pow(1 + r, luni) - 1);
+        } else {
+          factor = 1 / luni;
+        }
+
+        const creditMax = rataMax / factor;
+        const rataLunara = creditMax * factor;
+
+        document.getElementById(
+          "rataMax"
+        ).innerText = `Rata lunara maxima permisa: ${rataMax.toFixed(2)} RON`;
+        document.getElementById(
+          "creditMax"
+        ).innerText = `Valoare credit maxim estimata: ${creditMax.toFixed(
+          2
+        )} RON`;
+        document.getElementById(
+          "rataLunara"
+        ).innerText = `Rata lunara estimata (pe ${ani} ani): ${rataLunara.toFixed(
+          2
+        )} RON`;
+
+        document.getElementById("rezultate").style.display = "block";
+      });
+    </script>
+  </body>
+</html>

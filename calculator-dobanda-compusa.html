@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calculator Dobândă Compusă</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f7f9fc;
+        color: #222;
+        padding: 25px;
+        max-width: 700px;
+        margin: auto;
+      }
+      h1 {
+        text-align: center;
+        color: #204a87;
+      }
+      form {
+        background: white;
+        padding: 20px 25px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #bbb;
+      }
+      label {
+        display: block;
+        margin-top: 15px;
+        font-weight: 600;
+      }
+      input[type="number"],
+      select {
+        width: 100%;
+        padding: 8px 10px;
+        margin-top: 6px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+      }
+      button {
+        margin-top: 25px;
+        width: 100%;
+        padding: 12px;
+        background-color: #204a87;
+        border: none;
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #1860d8;
+      }
+      .result,
+      #chart-container,
+      #tabelRezultat {
+        margin-top: 25px;
+        padding: 20px;
+        background: #e6f0ff;
+        border-radius: 6px;
+        border: 1px solid #204a87;
+      }
+      .result {
+        font-size: 18px;
+        font-weight: 700;
+        color: #204a87;
+        text-align: center;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      th,
+      td {
+        padding: 8px 10px;
+        border: 1px solid #204a87;
+        text-align: right;
+      }
+      th {
+        background: #204a87;
+        color: white;
+      }
+      #chart {
+        width: 100%;
+        height: 350px;
+      }
+      #selectorRaportareContainer {
+        margin-top: 20px;
+        text-align: center;
+      }
+      #selectorRaportare {
+        font-size: 16px;
+        padding: 6px 12px;
+        border-radius: 4px;
+        border: 1px solid #204a87;
+        cursor: pointer;
+        background: white;
+        color: #204a87;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Calculator Dobândă Compusă cu Grafic și Tabel</h1>
+
+    <form id="formularDobandaCompusa" novalidate>
+      <label for="principal">Sumă inițială (principală) *</label>
+      <input
+        type="number"
+        id="principal"
+        name="principal"
+        min="0"
+        step="0.01"
+        placeholder="Ex: 10000"
+        required
+      />
+
+      <label for="rataAnuala">Rata dobânzii anuale (%) *</label>
+      <input
+        type="number"
+        id="rataAnuala"
+        name="rataAnuala"
+        min="0"
+        step="0.01"
+        placeholder="Ex: 5"
+        required
+      />
+
+      <label for="compuneriPeAn">Număr compuneri pe an *</label>
+      <select id="compuneriPeAn" name="compuneriPeAn" required>
+        <option value="1">Anual</option>
+        <option value="2">Semestrial</option>
+        <option value="4" selected>Trimestrial</option>
+        <option value="12">Lunar</option>
+        <option value="365">Zilnic</option>
+      </select>
+
+      <label for="ani">Număr de ani *</label>
+      <input
+        type="number"
+        id="ani"
+        name="ani"
+        min="0"
+        step="0.1"
+        placeholder="Ex: 10"
+        required
+      />
+
+      <label for="contributiePeriodica">Contribuție periodică (opțional)</label>
+      <input
+        type="number"
+        id="contributiePeriodica"
+        name="contributiePeriodica"
+        min="0"
+        step="0.01"
+        placeholder="Ex: 100"
+      />
+
+      <label for="frecventaContributie">Frecvența contribuției periodice</label>
+      <select id="frecventaContributie" name="frecventaContributie">
+        <option value="1">Anual</option>
+        <option value="2">Semestrial</option>
+        <option value="4" selected>Trimestrial</option>
+        <option value="12">Lunar</option>
+        <option value="365">Zilnic</option>
+      </select>
+
+      <button type="submit">Calculează</button>
+    </form>
+
+    <div id="selectorRaportareContainer" style="display: none">
+      <label for="selectorRaportare">Afișare rezultate:</label>
+      <select
+        id="selectorRaportare"
+        aria-label="Selectează afișarea rezultatelor lunar sau anual"
+      >
+        <option value="anual" selected>Anual</option>
+        <option value="lunar">Lunar</option>
+      </select>
+    </div>
+
+    <div
+      id="rezultat"
+      class="result"
+      aria-live="polite"
+      style="display: none"
+    ></div>
+
+    <div id="tabelRezultat" style="display: none; overflow-x: auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Perioadă</th>
+            <th>Suma investită total (RON)</th>
+            <th>Dobânda acumulată (RON)</th>
+            <th>Suma totală (RON)</th>
+          </tr>
+        </thead>
+        <tbody id="tabelBody"></tbody>
+      </table>
+    </div>
+
+    <div id="chart-container" style="display: none">
+      <canvas id="chart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const form = document.getElementById("formularDobandaCompusa");
+      const rezultatDiv = document.getElementById("rezultat");
+      const tabelRezultat = document.getElementById("tabelRezultat");
+      const tabelBody = document.getElementById("tabelBody");
+      const chartContainer = document.getElementById("chart-container");
+      const selectorRaportareContainer = document.getElementById(
+        "selectorRaportareContainer"
+      );
+      const selectorRaportare = document.getElementById("selectorRaportare");
+      let chartInstance = null;
+
+      let calcParams = null; // salvăm parametrii pentru recalculare la schimbare selector raportare
+
+      function calculeazaEvolutie(
+        P,
+        r,
+        n,
+        t,
+        PMT = 0,
+        pmtFreq = 1,
+        raportare = "anual"
+      ) {
+        const rezultateLunare = [];
+        const luniTotale = Math.round(t * 12);
+        let sumaInvestita = P;
+        let valoareCont = P;
+        let intervalContributie = 12 / pmtFreq;
+
+        for (let luna = 0; luna <= luniTotale; luna++) {
+          if (luna > 0) {
+            valoareCont += valoareCont * (r / 12);
+          }
+          if (PMT > 0 && luna > 0 && luna % intervalContributie === 0) {
+            valoareCont += PMT;
+            sumaInvestita += PMT;
+          }
+          rezultateLunare.push({ luna, valoare: valoareCont, sumaInvestita });
+        }
+
+        const rezultateFinale = [];
+        if (raportare === "anual") {
+          const ani = Math.ceil(t);
+          for (let an = 0; an <= ani; an++) {
+            let lunaIndex = an * 12;
+            if (lunaIndex >= rezultateLunare.length)
+              lunaIndex = rezultateLunare.length - 1;
+            const val = rezultateLunare[lunaIndex];
+            rezultateFinale.push({
+              perioada: an + " ani",
+              sumaInvestita: val.sumaInvestita,
+              dobandaAcumulata: val.valoare - val.sumaInvestita,
+              total: val.valoare,
+            });
+          }
+        } else {
+          for (let i = 0; i < rezultateLunare.length; i++) {
+            const val = rezultateLunare[i];
+            rezultateFinale.push({
+              perioada: i + " luni",
+              sumaInvestita: val.sumaInvestita,
+              dobandaAcumulata: val.valoare - val.sumaInvestita,
+              total: val.valoare,
+            });
+          }
+        }
+        return rezultateFinale;
+      }
+
+      function afiseazaRezultate(rezultate) {
+        tabelBody.innerHTML = "";
+        rezultate.forEach((rz) => {
+          tabelBody.innerHTML += `
+        <tr>
+          <td style="text-align:left">${rz.perioada}</td>
+          <td>${rz.sumaInvestita.toLocaleString("ro-RO", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}</td>
+          <td>${rz.dobandaAcumulata.toLocaleString("ro-RO", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}</td>
+          <td>${rz.total.toLocaleString("ro-RO", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}</td>
+        </tr>`;
+        });
+        tabelRezultat.style.display = "block";
+      }
+
+      function afiseazaGrafic(rezultate) {
+        const etichete = rezultate.map((rz) => rz.perioada);
+        const investitieData = rezultate.map((rz) => rz.sumaInvestita);
+        const dobandaData = rezultate.map((rz) => rz.dobandaAcumulata);
+
+        if (chartInstance) {
+          chartInstance.destroy();
+        }
+        const ctx = document.getElementById("chart").getContext("2d");
+
+        // Gradient pentru coloane cu partea investit (albastru) si partea dobanda (verde)
+        const gradient = ctx.createLinearGradient(0, 0, 0, 350);
+
+        chartInstance = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: etichete,
+            datasets: [
+              {
+                label: "Investiție",
+                data: investitieData,
+                backgroundColor: "rgba(32,74,135,0.8)",
+                stack: "Stack 0",
+              },
+              {
+                label: "Dobânda acumulată",
+                data: dobandaData,
+                backgroundColor: "rgba(60,179,113,0.8)",
+                stack: "Stack 0",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            interaction: { mode: "index", intersect: false },
+            stacked: true,
+            plugins: {
+              legend: { position: "top" },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) =>
+                    ctx.dataset.label +
+                    ": " +
+                    ctx.parsed.y.toLocaleString("ro-RO", {
+                      minimumFractionDigits: 2,
+                    }),
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { callback: (val) => val.toLocaleString("ro-RO") },
+              },
+            },
+          },
+        });
+
+        chartContainer.style.display = "block";
+      }
+
+      function afiseazaTot() {
+        const rezultate = calculeazaEvolutie(
+          ...calcParams,
+          selectorRaportare.value
+        );
+        afiseazaRezultate(rezultate);
+        afiseazaGrafic(rezultate);
+        rezultatDiv.textContent = `Suma totală după ${
+          calcParams[3]
+        } ani: ${rezultate[rezultate.length - 1].total.toLocaleString("ro-RO", {
+          minimumFractionDigits: 2,
+        })} RON`;
+        rezultatDiv.style.display = "block";
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        let P = parseFloat(form.principal.value);
+        let r = parseFloat(form.rataAnuala.value) / 100;
+        let n = parseInt(form.compuneriPeAn.value);
+        let t = parseFloat(form.ani.value);
+        let PMT = parseFloat(form.contributiePeriodica.value) || 0;
+        let pmtFreq = parseInt(form.frecventaContributie.value);
+
+        if (
+          isNaN(P) ||
+          P < 0 ||
+          isNaN(r) ||
+          r < 0 ||
+          isNaN(n) ||
+          n <= 0 ||
+          isNaN(t) ||
+          t <= 0
+        ) {
+          rezultatDiv.style.display = "block";
+          rezultatDiv.textContent =
+            "Vă rugăm să completați toate câmpurile obligatorii corect.";
+          tabelRezultat.style.display = "none";
+          chartContainer.style.display = "none";
+          selectorRaportareContainer.style.display = "none";
+          return;
+        }
+
+        calcParams = [P, r, n, t, PMT, pmtFreq];
+
+        selectorRaportareContainer.style.display = "block";
+        afiseazaTot();
+      });
+
+      selectorRaportare.addEventListener("change", afiseazaTot);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calculator rambursare anticipată</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 10px;
+      }
+      label {
+        display: block;
+        margin-top: 15px;
+        font-weight: bold;
+        position: relative;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        box-sizing: border-box;
+      }
+      button {
+        margin-top: 20px;
+        padding: 10px 15px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .result-box {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f2f2f2;
+        border-radius: 5px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #ccc;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: right;
+      }
+      th {
+        background: #eee;
+      }
+      td:first-child,
+      th:first-child {
+        text-align: center;
+      }
+      .tooltip-icon {
+        display: inline-block;
+        background: #007bff;
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        text-align: center;
+        line-height: 18px;
+        font-weight: bold;
+        font-size: 14px;
+        margin-left: 6px;
+        cursor: default;
+        position: relative;
+      }
+      .tooltip-icon:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+      }
+      .tooltip-text {
+        visibility: hidden;
+        width: 200px;
+        background-color: #333;
+        color: #fff;
+        text-align: left;
+        border-radius: 6px;
+        padding: 8px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 13px;
+        line-height: 1.3;
+      }
+      .tooltip-text::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #333 transparent transparent transparent;
+      }
+      .result-highlight {
+        font-size: 1.2em;
+        font-weight: 700;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Calculator rambursare anticipată</h1>
+
+    <form id="formScadentar" aria-label="Calculator scadentar credit">
+      <h2>Scadentar credit</h2>
+
+      <label for="soldInitial"
+        >Sold credit *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Suma totală a creditului rămas de rambursat.</span
+          >
+        </span>
+      </label>
+      <input
+        type="number"
+        id="soldInitial"
+        name="soldInitial"
+        min="0"
+        step="100"
+        required
+        placeholder="Ex: 250000"
+      />
+
+      <label for="dobandaInitiala"
+        >Dobândă (%) *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Dobânda anuală exprimată în procente.</span
+          >
+        </span>
+      </label>
+      <input
+        type="number"
+        id="dobandaInitiala"
+        name="dobandaInitiala"
+        min="0"
+        max="100"
+        step="0.01"
+        required
+        placeholder="Ex: 8"
+      />
+
+      <label for="comisionLunarInitial"
+        >Comision lunar *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Comisionul lunar perceput suplimentar.</span
+          >
+        </span>
+      </label>
+      <input
+        type="number"
+        id="comisionLunarInitial"
+        name="comisionLunarInitial"
+        min="0"
+        step="0.01"
+        value="0"
+        required
+        placeholder="Ex: 0"
+      />
+
+      <label for="perioadaInitiala"
+        >Perioadă (luni) *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Numărul total de luni rămase până la finalizarea creditului.</span
+          >
+        </span>
+      </label>
+      <input
+        type="number"
+        id="perioadaInitiala"
+        name="perioadaInitiala"
+        min="1"
+        max="600"
+        required
+        placeholder="Ex: 300"
+      />
+
+      <button type="submit">Calculează scadentar</button>
+    </form>
+
+    <div id="resultScadentar" aria-live="polite" style="display: none"></div>
+
+    <hr />
+
+    <form id="formRambursare" aria-label="Calculator rambursare anticipată">
+      <h2>Rambursare anticipată</h2>
+
+      <label for="soldCredit"
+        >Sold credit *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Soldul curent al creditului înainte de rambursare.</span
+          >
+        </span>
+      </label>
+      <input
+        type="number"
+        id="soldCredit"
+        name="soldCredit"
+        min="0"
+        step="100"
+        required
+        placeholder="Ex: 250000"
+      />
+
+      <label for="dobanda"
+        >Dobândă (%) *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Dobânda anuală (%) aplicată creditului.</span
+          >
+        </span>
+      </label>
+      <input
+        type="number"
+        id="dobanda"
+        name="dobanda"
+        min="0"
+        max="100"
+        step="0.01"
+        required
+        placeholder="Ex: 8"
+      />
+
+      <label for="comisionLunar"
+        >Comision lunar *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text">Comision lunar aplicat creditului.</span>
+        </span>
+      </label>
+      <input
+        type="number"
+        id="comisionLunar"
+        name="comisionLunar"
+        min="0"
+        step="0.01"
+        value="0"
+        required
+        placeholder="Ex: 0"
+      />
+
+      <label for="perioadaRamasa"
+        >Perioadă rămasă (luni) *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Numărul de luni rămase până la finalizarea creditului.</span
+          >
+        </span>
+      </label>
+      <input
+        type="number"
+        id="perioadaRamasa"
+        name="perioadaRamasa"
+        min="1"
+        max="600"
+        required
+        placeholder="Ex: 300"
+      />
+
+      <label for="rataLunaraActuala"
+        >Rată lunară actuală
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Rata lunară curentă calculată automat.</span
+          >
+        </span>
+      </label>
+      <input
+        type="number"
+        id="rataLunaraActuala"
+        name="rataLunaraActuala"
+        readonly
+        placeholder="Calculată automat"
+      />
+
+      <label for="rambursareAnticipata"
+        >Sumă rambursare anticipată *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Suma pe care doriți să o rambursați anticipat.</span
+          >
+        </span>
+      </label>
+      <input
+        type="number"
+        id="rambursareAnticipata"
+        name="rambursareAnticipata"
+        min="0"
+        step="100"
+        required
+        placeholder="Ex: 5000"
+      />
+
+      <label for="modalitateRambursare"
+        >Modalitate rambursare anticipată *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Alegeți dacă plata anticipată se face o singură dată sau lunar în
+            plus.</span
+          >
+        </span>
+      </label>
+      <select id="modalitateRambursare" name="modalitateRambursare" required>
+        <option value="1">Plată o singură dată</option>
+        <option value="2">Plată lunară în plus</option>
+      </select>
+
+      <label for="reducere"
+        >Reducere *
+        <span class="tooltip-icon"
+          >?
+          <span class="tooltip-text"
+            >Alegeți dacă doriți să reduceți perioada creditului sau rata
+            lunară.</span
+          >
+        </span>
+      </label>
+      <select id="reducere" name="reducere" required>
+        <option value="perioada">Reducere perioadă</option>
+        <option value="rata">Reducere rată</option>
+      </select>
+
+      <button type="submit">Calculează rambursare</button>
+    </form>
+
+    <div id="resultRambursare" aria-live="polite" style="display: none"></div>
+
+    <script>
+      function formatCurrency(value) {
+        return value.toLocaleString("ro-RO", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+
+      function calcMonthlyPayment(principal, monthlyRate, months, comision) {
+        if (monthlyRate === 0) return principal / months + comision;
+        return (
+          principal * (monthlyRate / (1 - Math.pow(1 + monthlyRate, -months))) +
+          comision
+        );
+      }
+
+      function totalInterestAndComision(
+        principal,
+        monthlyRate,
+        months,
+        comision
+      ) {
+        let balance = principal;
+        let totalInterest = 0;
+        let totalComision = 0;
+        let monthlyPayment = calcMonthlyPayment(
+          principal,
+          monthlyRate,
+          months,
+          comision
+        );
+        for (let m = 1; m <= months; m++) {
+          let interest = balance * monthlyRate;
+          let principalPaid = monthlyPayment - interest - comision;
+          if (principalPaid > balance) principalPaid = balance;
+          balance -= principalPaid;
+          totalInterest += interest;
+          totalComision += comision;
+        }
+        return { totalInterest, totalComision };
+      }
+
+      const formScadentar = document.getElementById("formScadentar");
+      const resultScadentar = document.getElementById("resultScadentar");
+
+      formScadentar.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const P = parseFloat(formScadentar.soldInitial.value);
+        const dobandaAnuala = parseFloat(formScadentar.dobandaInitiala.value);
+        const comision = parseFloat(formScadentar.comisionLunarInitial.value);
+        const n = parseInt(formScadentar.perioadaInitiala.value);
+
+        if (
+          isNaN(P) ||
+          isNaN(dobandaAnuala) ||
+          isNaN(n) ||
+          isNaN(comision) ||
+          P <= 0 ||
+          n <= 0
+        ) {
+          resultScadentar.style.display = "none";
+          return;
+        }
+
+        const i = dobandaAnuala / 12 / 100;
+        const monthlyPayment = calcMonthlyPayment(P, i, n, comision);
+
+        let html = `<p>Rată lunară: <strong>${formatCurrency(
+          monthlyPayment
+        )}</strong></p>`;
+        resultScadentar.innerHTML = html;
+        resultScadentar.style.display = "block";
+      });
+
+      // Rambursare anticipată form
+      const formRambursare = document.getElementById("formRambursare");
+      const resultRambursare = document.getElementById("resultRambursare");
+      const soldCreditInput = document.getElementById("soldCredit");
+      const dobandaInput = document.getElementById("dobanda");
+      const comisionLunarInput = document.getElementById("comisionLunar");
+      const perioadaRamasaInput = document.getElementById("perioadaRamasa");
+      const rataLunaraActualaInput =
+        document.getElementById("rataLunaraActuala");
+
+      function updateRataActuala() {
+        const sold = parseFloat(soldCreditInput.value);
+        const dobanda = parseFloat(dobandaInput.value);
+        const perioada = parseInt(perioadaRamasaInput.value);
+        const comision = parseFloat(comisionLunarInput.value);
+        if (
+          isNaN(sold) ||
+          isNaN(dobanda) ||
+          isNaN(perioada) ||
+          isNaN(comision) ||
+          sold <= 0 ||
+          perioada <= 0
+        ) {
+          rataLunaraActualaInput.value = "";
+          return;
+        }
+        const i = dobanda / 12 / 100;
+        const rata = calcMonthlyPayment(sold, i, perioada, comision);
+        rataLunaraActualaInput.value = rata.toFixed(2);
+      }
+
+      soldCreditInput.addEventListener("input", updateRataActuala);
+      dobandaInput.addEventListener("input", updateRataActuala);
+      comisionLunarInput.addEventListener("input", updateRataActuala);
+      perioadaRamasaInput.addEventListener("input", updateRataActuala);
+
+      formRambursare.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const sold = parseFloat(formRambursare.soldCredit.value);
+        const dobanda = parseFloat(formRambursare.dobanda.value);
+        const comision = parseFloat(formRambursare.comisionLunar.value);
+        const perioada = parseInt(formRambursare.perioadaRamasa.value);
+        const rataActuala = parseFloat(formRambursare.rataLunaraActuala.value);
+        const sumaRambursare = parseFloat(
+          formRambursare.rambursareAnticipata.value
+        );
+        const modalitate = formRambursare.modalitateRambursare.value;
+        const reducere = formRambursare.reducere.value;
+
+        if (
+          [sold, dobanda, comision, perioada, rataActuala, sumaRambursare].some(
+            (v) => isNaN(v) || v < 0
+          ) ||
+          perioada <= 0
+        ) {
+          resultRambursare.style.display = "none";
+          return;
+        }
+
+        const i = dobanda / 12 / 100;
+        const soldNou = sold - sumaRambursare;
+
+        if (soldNou <= 0) {
+          resultRambursare.innerHTML =
+            "<p><strong>Suma rambursată depășește soldul creditului!</strong></p>";
+          resultRambursare.style.display = "block";
+          return;
+        }
+
+        let nouaRata = rataActuala;
+        let nouaPerioada = perioada;
+
+        if (modalitate === "1") {
+          if (reducere === "perioada") {
+            nouaPerioada = Math.ceil(
+              -Math.log(1 - (i * soldNou) / (rataActuala - comision)) /
+                Math.log(1 + i)
+            );
+            if (isNaN(nouaPerioada) || !isFinite(nouaPerioada)) {
+              resultRambursare.innerHTML =
+                "<p><strong>Nu se poate calcula noua perioadă.</strong></p>";
+              resultRambursare.style.display = "block";
+              return;
+            }
+            nouaRata = rataActuala;
+          } else {
+            nouaRata = calcMonthlyPayment(soldNou, i, perioada, comision);
+          }
+        } else {
+          resultRambursare.innerHTML =
+            "<p>Modalitatea <em>Plată lunară în plus</em> nu este implementată în acest demo.</p>";
+          resultRambursare.style.display = "block";
+          return;
+        }
+
+        const initialTotals = totalInterestAndComision(
+          sold,
+          i,
+          perioada,
+          comision
+        );
+        const newTotals = totalInterestAndComision(
+          soldNou,
+          i,
+          nouaPerioada,
+          comision
+        );
+
+        const dobandaEconomisita =
+          initialTotals.totalInterest - newTotals.totalInterest;
+        const comisioaneEconomisite =
+          initialTotals.totalComision - newTotals.totalComision;
+
+        let html = `
+  <p class="result-highlight">Noua rată lunară: <strong>${formatCurrency(
+    nouaRata
+  )}</strong></p>
+  <p class="result-highlight">Noua perioadă rămasă: <strong>${nouaPerioada} luni (${
+          nouaPerioada - perioada
+        })</strong></p>
+  <p class="result-highlight">Total dobândă economisită: <strong>${formatCurrency(
+    dobandaEconomisita
+  )}</strong></p>
+  <p class="result-highlight">Total comisioane economisite: <strong>${formatCurrency(
+    comisioaneEconomisite
+  )}</strong></p>`;
+
+        resultRambursare.innerHTML = html;
+        resultRambursare.style.display = "block";
+      });
+    </script>
+  </body>
+</html>
