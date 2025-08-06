@@ -190,6 +190,15 @@
           <option value="12">Lunar</option>
         </select>
 
+        <label for="crestereAnuala">Crestere anuala a contributiei (%):</label>
+        <input
+          type="number"
+          id="crestereAnuala"
+          min="0"
+          step="0.01"
+          value="0"
+        />
+
         <button type="submit">CALCULEAZA</button>
       </form>
 
@@ -255,6 +264,7 @@
         t,
         PMT = 0,
         pmtFreq = 1,
+        crestereAnuala = 0,
         raportare = "anual"
       ) {
         const rezultate = [];
@@ -262,18 +272,31 @@
 
         let sumaInvestita = P;
         let valoareCont = P;
-
-        const intervalCompunere = 12 / n; // luni între compuneri dobândă
-        const intervalContributie = 12 / pmtFreq; // luni între contribuții
+        let contributieCurenta = PMT;
+        const intervalCompunere = 12 / n;
+        const intervalContributie = 12 / pmtFreq;
+        const luniPerAn = 12;
 
         for (let luna = 0; luna <= luniTotale; luna++) {
-          // Adaugă contribuție doar la lunile corespunzătoare
-          if (PMT > 0 && luna > 0 && luna % intervalContributie === 0) {
-            valoareCont += PMT;
-            sumaInvestita += PMT;
+          const anCurent = Math.floor(luna / 12);
+
+          // Aplica cresterea anuala a contributiei (o data pe an, de obicei la inceputul anului)
+          if (
+            PMT > 0 &&
+            crestereAnuala > 0 &&
+            luna % luniPerAn === 0 &&
+            luna !== 0
+          ) {
+            contributieCurenta *= 1 + crestereAnuala;
           }
 
-          // Aplică dobânda doar la lunile corespunzătoare compunerii
+          // Adauga contributie la lunile corespunzatoare
+          if (PMT > 0 && luna > 0 && luna % intervalContributie === 0) {
+            valoareCont += contributieCurenta;
+            sumaInvestita += contributieCurenta;
+          }
+
+          // Aplica dobanda la lunile corespunzatoare
           if (luna > 0 && luna % intervalCompunere === 0) {
             valoareCont += valoareCont * (r / n);
           }
@@ -281,7 +304,7 @@
           rezultate.push({ luna, valoare: valoareCont, sumaInvestita });
         }
 
-        // Pregătim rezultatele pentru afișare în funcție de raportare (anual sau lunar)
+        // Pregatim afisarea
         const rezultateFinale = [];
 
         if (raportare === "anual") {
@@ -433,6 +456,7 @@
         let t = parseFloat(form.ani.value);
         let PMT = parseFloat(form.contributiePeriodica.value) || 0;
         let pmtFreq = parseInt(form.frecventaContributie.value);
+        let crestereAnuala = parseFloat(form.crestereAnuala.value) / 100 || 0;
 
         if (
           isNaN(P) ||
@@ -443,13 +467,14 @@
           r < 0 ||
           n <= 0 ||
           t < 0 ||
-          PMT < 0
+          PMT < 0 ||
+          crestereAnuala < 0
         ) {
           alert("Te rog sa completezi corect toate campurile.");
           return;
         }
 
-        calcParams = [P, r, n, t, PMT, pmtFreq];
+        calcParams = [P, r, n, t, PMT, pmtFreq, crestereAnuala];
         selectorRaportareContainer.style.display = "block";
         afiseazaTot();
       });
