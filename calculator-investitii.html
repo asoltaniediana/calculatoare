@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Calculator Investiții</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --btn-bg-color: #faa61a;
+        --btn-bg-hover: #d48800;
+      }
+
+      body {
+        font-family: "Source Sans Pro", sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+
+      .calculator,
+      .rezultate,
+      .chartarea {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background: none; /* fără fundal alb */
+        border-radius: 0; /* fără colțuri rotunjite */
+        box-shadow: none; /* fără umbră */
+      }
+
+      h1,
+      .rezultate h2 {
+        color: #1a1a1a;
+        font-size: 20px;
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-top: 15px; /* spațiu deasupra label */
+        margin-bottom: 6px; /* spațiu între label și input */
+        font-weight: 600;
+        color: #333;
+      }
+
+      input[type="number"] {
+        width: 100%;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        box-sizing: border-box;
+        font-family: "Source Sans Pro", sans-serif;
+      }
+
+      button {
+        background-color: var(--btn-bg-color);
+        color: #fff;
+        margin-top: 10px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        width: auto; /* lățime automată */
+        padding: 10px 20px; /* padding mai larg */
+        display: block;
+        margin-left: auto;
+        margin-right: auto; /* centrare orizontală */
+        font-size: 16px;
+        border-radius: 4px;
+        font-family: "Source Sans Pro", sans-serif;
+        white-space: nowrap; /* să nu se rupă textul */
+      }
+
+      button:hover {
+        background-color: var(--btn-bg-hover);
+      }
+
+      .rezultate {
+        background-color: #fffef7; /* fundal deschis */
+        border: 1px solid #f0e6c8; /* margine subtilă */
+        border-radius: 6px;
+        padding: 25px 20px;
+        box-shadow: 0 2px 6px rgba(250, 166, 26, 0.2);
+        color: #333;
+      }
+
+      .rezultate p {
+        font-size: 17px;
+        line-height: 1.5;
+        margin: 12px 0;
+        font-weight: 500;
+      }
+
+      .rezultate strong {
+        color: #faa61a;
+      }
+
+      .chartarea {
+        position: relative;
+      }
+
+      canvas#grafica {
+        width: 100% !important;
+        max-height: 50vh !important;
+        display: block;
+        margin: 0 auto;
+      }
+
+      #desfasurator {
+        margin-top: 15px;
+      }
+
+      #desfasurator button {
+        width: auto;
+        display: inline-block;
+        padding: 8px 16px;
+        margin-right: 8px;
+        font-family: "Source Sans Pro", sans-serif;
+        cursor: pointer;
+      }
+
+      #tabel {
+        margin-top: 15px;
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: "Source Sans Pro", sans-serif;
+      }
+
+      th {
+        background-color: #f0f4ff;
+        text-align: left;
+        padding: 8px;
+        font-weight: bold;
+      }
+
+      td {
+        padding: 8px;
+        border-top: 1px solid #ddd;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @media (max-width: 480px) {
+        .calculator,
+        .rezultate,
+        .chartarea {
+          padding: 15px;
+          margin: 10px;
+        }
+        input[type="number"],
+        button {
+          font-size: 14px;
+          padding: 8px 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="calculator">
+      <h1>Calculator Investiții</h1>
+
+      <div class="row">
+        <label for="principal">Sumă inițială investită (RON):</label>
+        <input type="number" id="principal" min="0" value="0" />
+
+        <label for="aport">Aport lunar (RON):</label>
+        <input type="number" id="aport" min="0" value="1000" />
+
+        <label for="dobanda">Randament anual (%):</label>
+        <input type="number" id="dobanda" step="0.01" value="7" />
+
+        <label for="ani">Durata investiției (ani):</label>
+        <input type="number" id="ani" min="1" value="20" />
+      </div>
+
+      <button id="calcBtn">CALCULEAZA</button>
+    </div>
+
+    <div class="rezultate hidden" id="rezultate">
+      <h2>Rezultate calcul</h2>
+      <p>
+        <strong>Investiție totală:</strong> <span id="totalInvestit"></span> RON
+      </p>
+      <p>
+        <strong>Valoare la sfârșitul perioadei:</strong>
+        <span id="valoareFinala"></span> RON
+      </p>
+      <p><strong>Profit:</strong> <span id="profit"></span> RON</p>
+    </div>
+
+    <div class="chartarea hidden" id="chartarea">
+      <canvas id="grafica"></canvas>
+
+      <div id="desfasurator">
+        <button id="toggleBtn">AFISEAZA DESFASURATOR</button>
+        <div id="tabel" class="hidden"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+      document.getElementById("calcBtn").addEventListener("click", function () {
+        const P = parseFloat(document.getElementById("principal").value) || 0;
+        const A = parseFloat(document.getElementById("aport").value) || 0;
+        const r =
+          (parseFloat(document.getElementById("dobanda").value) || 0) / 100;
+        const ani = parseInt(document.getElementById("ani").value) || 1;
+        const luni = ani * 12;
+        const rl = r / 12;
+
+        let investitieTotala = P;
+        let total = P;
+        let investitii = [P];
+        let totaluri = [P];
+        let luniLabels = [0];
+
+        let tabel = [["Luna", "Investiție totală", "Valoare totală"]];
+
+        for (let luna = 1; luna <= luni; luna++) {
+          total = total * (1 + rl) + A;
+          investitieTotala += A;
+
+          luniLabels.push(luna);
+          investitii.push(investitieTotala);
+          totaluri.push(total);
+
+          tabel.push([luna, investitieTotala.toFixed(2), total.toFixed(2)]);
+        }
+
+        const profit = total - investitieTotala;
+
+        document.getElementById("totalInvestit").textContent =
+          investitieTotala.toLocaleString("ro-RO", {
+            minimumFractionDigits: 2,
+          });
+        document.getElementById("valoareFinala").textContent =
+          total.toLocaleString("ro-RO", {
+            minimumFractionDigits: 2,
+          });
+        document.getElementById("profit").textContent = profit.toLocaleString(
+          "ro-RO",
+          {
+            minimumFractionDigits: 2,
+          }
+        );
+
+        document.getElementById("rezultate").classList.remove("hidden");
+        document.getElementById("chartarea").classList.remove("hidden");
+
+        if (window.myChart) window.myChart.destroy();
+        const ctx = document.getElementById("grafica").getContext("2d");
+        window.myChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: luniLabels,
+            datasets: [
+              {
+                label: "Investiție totală",
+                data: investitii,
+                borderColor: "#faa61a",
+                backgroundColor: "rgba(250, 166, 26, 0.2)",
+                borderWidth: 2,
+                fill: false,
+                tension: 0.2,
+                pointRadius: 0, // fără puncte pe linie
+              },
+              {
+                label: "Valoare totală",
+                data: totaluri,
+                borderColor: "#333",
+                backgroundColor: "rgba(51, 51, 51, 0.2)",
+                borderWidth: 2,
+                fill: false,
+                tension: 0.2,
+                pointRadius: 0, // fără puncte pe linie
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: "bottom" },
+              tooltip: { mode: "index", intersect: false },
+            },
+            interaction: {
+              mode: "nearest",
+              axis: "x",
+              intersect: false,
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: (val) =>
+                    val.toLocaleString("ro-RO", { minimumFractionDigits: 2 }),
+                },
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: "Luni",
+                },
+              },
+            },
+          },
+        });
+
+        let html =
+          "<table><thead><tr><th>Luna</th><th>Investiție totală (RON)</th><th>Valoare totală (RON)</th></tr></thead><tbody>";
+        for (let i = 1; i < tabel.length; i++) {
+          html += `<tr><td>${tabel[i][0]}</td><td>${parseFloat(
+            tabel[i][1]
+          ).toLocaleString("ro-RO", {
+            minimumFractionDigits: 2,
+          })}</td><td>${parseFloat(tabel[i][2]).toLocaleString("ro-RO", {
+            minimumFractionDigits: 2,
+          })}</td></tr>`;
+        }
+        html += "</tbody></table>";
+        document.getElementById("tabel").innerHTML = html;
+
+        window._tabelXLSX = tabel;
+      });
+
+      document
+        .getElementById("toggleBtn")
+        .addEventListener("click", function () {
+          const tabelDiv = document.getElementById("tabel");
+          tabelDiv.classList.toggle("hidden");
+          this.textContent = tabelDiv.classList.contains("hidden")
+            ? "AFISEAZA DESFASURATOR"
+            : "ASCUNDE DESFASURATOR";
+        });
+
+      document
+        .getElementById("exportBtn")
+        .addEventListener("click", function () {
+          if (!window._tabelXLSX) return alert("Calculează mai întâi.");
+
+          const ws = XLSX.utils.aoa_to_sheet(window._tabelXLSX);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Investitie");
+          XLSX.writeFile(wb, "desfasurator_investitie.xlsx");
+        });
+    </script>
+  </body>
+</html>
