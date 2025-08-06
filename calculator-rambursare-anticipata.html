@@ -492,7 +492,7 @@ function actualizeazaRataCurenta() {
   }
 
   const rata = calculeazaRata(p, d, n, c);
-  rataCurentaInput.value = rata.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  rataCurentaInput.value = rata.toFixed(2);
 }
 
 [soldCredit, dobanda, perioadaRamasa, comisionLunar].forEach(el => {
