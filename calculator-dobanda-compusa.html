@@ -376,12 +376,33 @@
         );
         afiseazaRezultate(rezultate);
         afiseazaGrafic(rezultate);
-        rezultatText.innerText = `Suma totala dupa ${
-          calcParams[3]
-        } ani: ${rezultate[rezultate.length - 1].total.toLocaleString("ro-RO", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })} RON`;
+
+        const ultimulRezultat = rezultate[rezultate.length - 1];
+        const ani = calcParams[3];
+
+        rezultatText.innerHTML = `
+    <p>Suma totală după <strong>${ani} ani</strong>: <strong>${ultimulRezultat.total.toLocaleString(
+          "ro-RO",
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }
+        )} RON</strong></p>
+    <p>Sumă contribuită: <strong>${ultimulRezultat.sumaInvestita.toLocaleString(
+      "ro-RO",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    )} RON</strong></p>
+    <p>Dobândă acumulată: <strong>${ultimulRezultat.dobandaAcumulata.toLocaleString(
+      "ro-RO",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    )} RON</strong></p>
+  `;
       }
 
       form.addEventListener("submit", (e) => {
