@@ -229,17 +229,7 @@
           investitii.push(investitieTotala);
           totaluri.push(total);
 
-          tabel.push([
-            luna,
-            investitieTotala.toLocaleString("ro-RO", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }),
-            total.toLocaleString("ro-RO", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }),
-          ]);
+          tabel.push([luna, investitieTotala, total]);
         }
 
         const profit = total - investitieTotala;
