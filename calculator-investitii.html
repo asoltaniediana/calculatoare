@@ -175,8 +175,8 @@
         <label for="dobanda">Randament anual (%):</label>
         <input type="number" id="dobanda" step="0.01" value="7" />
 
-        <label for="ani">Durata investitiei (ani):</label>
-        <input type="number" id="ani" min="1" value="20" />
+        <label for="luni">Durata investitiei (luni):</label>
+        <input type="number" id="luni" min="1" value="240" />
       </div>
 
       <button id="calcBtn">CALCULEAZA</button>
@@ -211,8 +211,7 @@
         const A = parseFloat(document.getElementById("aport").value) || 0;
         const r =
           (parseFloat(document.getElementById("dobanda").value) || 0) / 100;
-        const ani = parseInt(document.getElementById("ani").value) || 1;
-        const luni = ani * 12;
+        const luni = parseInt(document.getElementById("luni").value) || 1;
         const rl = r / 12;
 
         let investitieTotala = P;
