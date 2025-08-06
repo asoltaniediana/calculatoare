@@ -292,9 +292,18 @@
           tabelBody.innerHTML += `
             <tr>
               <td style="text-align:left">${rz.perioada}</td>
-              <td>${rz.sumaInvestita.toFixed(2)}</td>
-              <td>${rz.dobandaAcumulata.toFixed(2)}</td>
-              <td>${rz.total.toFixed(2)}</td>
+              <td>${rz.sumaInvestita.toLocaleString("ro-RO", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}</td>
+              <td>${rz.dobandaAcumulata.toLocaleString("ro-RO", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}</td>
+              <td>${rz.total.toLocaleString("ro-RO", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}</td>
             </tr>`;
         });
         tabelRezultat.style.display = "block";
@@ -335,7 +344,12 @@
               tooltip: {
                 callbacks: {
                   label: (ctx) =>
-                    ctx.dataset.label + ": " + ctx.parsed.y.toFixed(2),
+                    ctx.dataset.label +
+                    ": " +
+                    ctx.parsed.y.toLocaleString("ro-RO", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }),
                 },
               },
             },
@@ -358,7 +372,10 @@
         afiseazaGrafic(rezultate);
         rezultatText.innerText = `Suma totala dupa ${
           calcParams[3]
-        } ani: ${rezultate[rezultate.length - 1].total.toFixed(2)} RON`;
+        } ani: ${rezultate[rezultate.length - 1].total.toLocaleString("ro-RO", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })} RON`;
       }
 
       form.addEventListener("submit", (e) => {

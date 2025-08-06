@@ -439,10 +439,10 @@ form.addEventListener("submit", function (e) {
   resultRambursare.style.display = "block";
   resultRambursare.innerHTML = `
     <h3>REZULTAT</h3>
-    <p><strong>Noua rata lunara:</strong> ${nouaRata.toFixed(2)}</p>
+    <p><strong>Noua rata lunara:</strong> ${nouaRata.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
     <p><strong>Noua perioada ramasa:</strong> ${nouaPerioada} (${nouaPerioada - n >= 0 ? "+" : ""}${nouaPerioada - n})</p>
-    <p><strong>Total dobanda economisita:</strong> ${dobandaEconomisita.toFixed(2)}</p>
-    <p><strong>Total comisioane economisite:</strong> ${comisioaneEconomisite > 0 ? comisioaneEconomisite.toFixed(2) : "0.00"}</p>
+    <p><strong>Total dobanda economisita:</strong> ${dobandaEconomisita.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+    <p><strong>Total comisioane economisite:</strong> ${comisioaneEconomisite > 0 ? comisioaneEconomisite.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}</p>
   `;
 
   scadentarBody.innerHTML = "";
@@ -451,10 +451,10 @@ form.addEventListener("submit", function (e) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${row.luna}</td>
-      <td>${row.sold.toFixed(2)}</td>
-      <td>${row.principal.toFixed(2)}</td>
-      <td>${row.dobanda.toFixed(2)}</td>
-      <td>${row.rata.toFixed(2)}</td>
+      <td>${row.sold.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td>${row.principal.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td>${row.dobanda.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td>${row.rata.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
     `;
     scadentarBody.appendChild(tr);
   });
@@ -492,7 +492,7 @@ function actualizeazaRataCurenta() {
   }
 
   const rata = calculeazaRata(p, d, n, c);
-  rataCurentaInput.value = rata.toFixed(2);
+  rataCurentaInput.value = rata.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 [soldCredit, dobanda, perioadaRamasa, comisionLunar].forEach(el => {
