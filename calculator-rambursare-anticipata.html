@@ -40,7 +40,7 @@
     font-size: 20px;
     font-weight: 600;
     color: #1a1a1a;
-    border-bottom: 2px solid #faa61a;
+  
     padding-bottom: 6px;
     margin-bottom: 16px;
   }
@@ -209,11 +209,11 @@
   <h1>Calculator rambursare anticipată</h1>
 
   <form id="formRambursare" aria-label="Calculator rambursare anticipată">
-    <h2>Rambursare anticipată</h2>
+  
 
   <div class="input-row">
   <div>
-    <label for="soldCredit">Sold credit *</label>
+    <label for="soldCredit">Sold credit</label>
     <input
       type="number"
       id="soldCredit"
@@ -226,7 +226,7 @@
   </div>
 
   <div>
-    <label for="dobanda">Dobândă anuala (%) *</label>
+    <label for="dobanda">Dobândă anuala (%)</label>
     <input
       type="number"
       id="dobanda"
@@ -244,7 +244,7 @@
    <div class="input-row">
   <div>
     <label for="comisionLunar">
-      Comision lunar *
+      Comision lunar
       <span class="tooltip-icon">?
         <span class="tooltip-text">Comision lunar aplicat creditului.</span>
       </span>
@@ -262,7 +262,7 @@
 
   <div>
     <label for="perioadaRamasa">
-      Perioadă rămasă (luni) *
+      Perioadă rămasă (luni)
       <span class="tooltip-icon">?
         <span class="tooltip-text">Numărul de luni rămase până la finalizarea creditului.</span>
       </span>
@@ -282,9 +282,9 @@
 <div class="input-row">
    <div>
     <label for="sumaRambursare">
-      Sumă rambursare anticipată *
+      Sumă rambursare anticipată
       <span class="tooltip-icon">?
-        <span class="tooltip-text">Suma pe care o vei plăti anticipat.</span>
+        <span class="tooltip-text">Suma pe care o vei plăti anticipat (o data).</span>
       </span>
     </label>
     <input
@@ -298,16 +298,7 @@
     />
   </div>
   <div>
-    <label for="tipRambursare">
-      Tip rambursare anticipată *
-      <span class="tooltip-icon">?
-        <span class="tooltip-text">Alege dacă rambursarea anticipată este o singură plată sau lunară.</span>
-      </span>
-    </label>
-    <select id="tipRambursare" name="tipRambursare" required>
-      <option value="odata">O dată</option>
-      <option value="lunara">Lunară</option>
-    </select>
+    
   </div>
 
  
@@ -315,7 +306,7 @@
 
 <div class="input-row">
   <div>
-    <label for="modificareCredit">Ce dorești să modifici la credit? *</label>
+    <label for="modificareCredit">Ce dorești să modifici la credit?</label>
     <select id="modificareCredit" name="modificareCredit" required>
       <option value="pastrezRata">Păstrez rata (reduc perioada)</option>
       <option value="pastrezPerioada">Păstrez perioada (reduc rata)</option>
@@ -340,46 +331,32 @@
 
   <div id="resultRambursare" aria-live="polite" style="display: none;"></div>
 
-  <section
-    id="scadentarNou"
-    style="display: none; max-width: 600px; margin: 30px auto; padding: 0 20px;"
-  >
-    <h2>Scadentar nou</h2>
-    <button
-      id="toggleScadentarBtn"
-      type="button"
-      style="margin-bottom: 12px;"
-    >
-      ARATA SCADENTAR
-    </button>
-    <table
-      border="1"
-      cellpadding="6"
-      cellspacing="0"
-      style="width: 100%; border-collapse: collapse; display: none;"
-    >
-      <thead>
-        <tr>
-          <th>Luni</th>
-          <th>Sold Credit</th>
-          <th>Principal</th>
-          <th>Valoare dobândă</th>
-          <th>Rată lunară</th>
-        </tr>
-      </thead>
-      <tbody id="scadentarBody"></tbody>
-    </table>
-  </section>
-</main>
+ <button id="toggleScadentarBtn" type="button" style="display:none; margin-top: 1rem;">ARATA SCADENTAR</button>
 
-    <script>
-    const form = document.getElementById("formRambursare");
+<section id="scadentarNou" style="display:none; margin-top: 1rem;">
+  <h2>Scadentar nou</h2>
+  <table border="1" style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th>Luna</th>
+        <th>Sold</th>
+        <th>Principal</th>
+        <th>Dobândă</th>
+        <th>Rată</th>
+      </tr>
+    </thead>
+    <tbody id="scadentarBody"></tbody>
+  </table>
+</section>
+
+</main>
+<script>
+const form = document.getElementById("formRambursare");
 const resultRambursare = document.getElementById("resultRambursare");
 const modificareCredit = document.getElementById("modificareCredit");
 const scadentarNouSection = document.getElementById("scadentarNou");
 const scadentarBody = document.getElementById("scadentarBody");
 const toggleScadentarBtn = document.getElementById("toggleScadentarBtn");
-const scadentarTable = scadentarNouSection.querySelector("table");
 
 function calculeazaRata(sold, dobandaAnuala, luni, comision) {
   const dobandaLunara = dobandaAnuala / 12 / 100;
@@ -402,9 +379,9 @@ function calculeazaScadentar(soldInitial, dobandaAnuala, perioada, comision, rat
     if (sold < 0) sold = 0;
     scadentar.push({
       luna,
-      sold: sold > 0 ? sold : 0,
-      principal: principal > 0 ? principal : 0,
-      dobanda: dobanda > 0 ? dobanda : 0,
+      sold,
+      principal,
+      dobanda,
       rata: rataLunara,
     });
   }
@@ -415,7 +392,6 @@ function calculeazaScadentar(soldInitial, dobandaAnuala, perioada, comision, rat
 form.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  // Colectăm datele
   const p = parseFloat(form.soldCredit.value);
   const d = parseFloat(form.dobanda.value);
   const n = parseInt(form.perioadaRamasa.value);
@@ -425,60 +401,53 @@ form.addEventListener("submit", function (e) {
 
   if ([p, d, n, c, suma].some(x => isNaN(x) || x < 0) || n === 0) {
     resultRambursare.style.display = "block";
-    resultRambursare.textContent = "Completează corect toate câmpurile.";
+    resultRambursare.textContent = "Completeaza corect toate campurile.";
+    toggleScadentarBtn.style.display = "none";
+    scadentarNouSection.style.display = "none";
     return;
   }
 
-  // Rata curentă
   const rataCurenta = calculeazaRata(p, d, n, c);
+  let nouaRata = 0;
+  let nouaPerioada = 0;
 
-  let nouaRata, nouaPerioada;
+  const dobandaLunara = d / 12 / 100;
 
-  if (tipModificare === "pastrezRata") {
-    // păstrăm rata, reduc perioada
-    // Nou sold după rambursare
-    const soldNou = p - suma;
-    // Calculăm noua perioadă n' cu formula inversă:
-    const dobandaLunara = d / 12 / 100;
-    if (dobandaLunara === 0) {
-      nouaPerioada = Math.ceil(soldNou / (rataCurenta - c));
-      nouaRata = rataCurenta;
+ 
+    const soldNou = Math.max(p - suma, 0);
+    if (tipModificare === "pastrezRata") {
+      if (dobandaLunara === 0) {
+        nouaPerioada = Math.ceil(soldNou / (rataCurenta - c));
+        nouaRata = rataCurenta;
+      } else {
+        nouaPerioada = Math.ceil(
+          -Math.log(1 - (dobandaLunara * soldNou) / (rataCurenta - c)) / Math.log(1 + dobandaLunara)
+        );
+        nouaRata = rataCurenta;
+      }
     } else {
-      // n' = -log(1 - dobandaLunara * soldNou / (rataCurenta - c)) / log(1 + dobandaLunara)
-      nouaPerioada = Math.ceil(
-        -Math.log(1 - (dobandaLunara * soldNou) / (rataCurenta - c)) / Math.log(1 + dobandaLunara)
-      );
-      nouaRata = rataCurenta;
+      nouaPerioada = n;
+      nouaRata = calculeazaRata(soldNou, d, nouaPerioada, c);
     }
-  } else {
-    // păstrăm perioada, reduc rata
-    const soldNou = p - suma;
-    nouaPerioada = n;
-    nouaRata = calculeazaRata(soldNou, d, nouaPerioada, c);
-  }
+  
 
-  // Calcul economii dobanda si comisioane
   const totalPlatitInitial = rataCurenta * n;
   const totalPlatitNou = nouaRata * nouaPerioada + suma;
   const dobandaEconomisita = Math.max(0, totalPlatitInitial - totalPlatitNou);
   const comisioaneEconomisite = c * (n - nouaPerioada);
 
-  // Afisare rezultate
   resultRambursare.style.display = "block";
   resultRambursare.innerHTML = `
     <h3>REZULTAT</h3>
-    <p><strong>Noua rată lunară:</strong> ${nouaRata.toFixed(2)}</p>
-    <p><strong>Noua perioadă rămasă:</strong> ${nouaPerioada} (${nouaPerioada - n > 0 ? '+' : ''}${nouaPerioada - n})</p>
-    <p><strong>Total dobândă economisită:</strong> ${dobandaEconomisita.toFixed(2)}</p>
-    <p><strong>Total comisioane economisite:</strong> ${comisioaneEconomisite > 0 ? comisioaneEconomisite.toFixed(2) : '0.00'}</p>
+    <p><strong>Noua rata lunara:</strong> ${nouaRata.toFixed(2)}</p>
+    <p><strong>Noua perioada ramasa:</strong> ${nouaPerioada} (${nouaPerioada - n >= 0 ? "+" : ""}${nouaPerioada - n})</p>
+    <p><strong>Total dobanda economisita:</strong> ${dobandaEconomisita.toFixed(2)}</p>
+    <p><strong>Total comisioane economisite:</strong> ${comisioaneEconomisite > 0 ? comisioaneEconomisite.toFixed(2) : "0.00"}</p>
   `;
 
-  // Generare scadentar nou (afișare maxim 12 luni ca exemplu)
-  const scadentar = calculeazaScadentar(p - suma, d, nouaPerioada, c, nouaRata);
-
-  // Curățăm și populăm tabelul
   scadentarBody.innerHTML = "";
-  scadentar.slice(0, 12).forEach(row => {
+  const scadentar = calculeazaScadentar(p - suma, d, nouaPerioada, c, nouaRata);
+  scadentar.forEach(row => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${row.luna}</td>
@@ -490,61 +459,50 @@ form.addEventListener("submit", function (e) {
     scadentarBody.appendChild(tr);
   });
 
-  scadentarNouSection.style.display = "block";
-  scadentarTable.style.display = "none";
+  scadentarNouSection.style.display = "none";
+  toggleScadentarBtn.style.display = "block";
+  toggleScadentarBtn.textContent = "ARATA SCADENTAR";
 });
 
-// Toggle scadentar
 toggleScadentarBtn.addEventListener("click", () => {
-  if (scadentarTable.style.display === "none") {
-    scadentarTable.style.display = "table";
-    toggleScadentarBtn.textContent = "Ascunde scadentar";
+  if (scadentarNouSection.style.display === "none") {
+    scadentarNouSection.style.display = "block";
+    toggleScadentarBtn.textContent = "ASCUNDE SCADENTAR";
   } else {
-    scadentarTable.style.display = "none";
-    toggleScadentarBtn.textContent = "Arată scadentar";
+    scadentarNouSection.style.display = "none";
+    toggleScadentarBtn.textContent = "ARATA SCADENTAR";
   }
 });
 
-    </script>
-    <script>
-  const soldCredit = document.getElementById("soldCredit");
-  const dobanda = document.getElementById("dobanda");
-  const perioadaRamasa = document.getElementById("perioadaRamasa");
-  const comisionLunar = document.getElementById("comisionLunar");
-  const rataCurentaInput = document.getElementById("rataCurenta");
+const soldCredit = document.getElementById("soldCredit");
+const dobanda = document.getElementById("dobanda");
+const perioadaRamasa = document.getElementById("perioadaRamasa");
+const comisionLunar = document.getElementById("comisionLunar");
+const rataCurentaInput = document.getElementById("rataCurenta");
 
-  function calculeazaRata(sold, dobandaAnuala, luni, comision) {
-    const dobandaLunara = dobandaAnuala / 12 / 100;
-    if (dobandaLunara === 0) {
-      return sold / luni + comision;
-    }
-    const rataFaraComision = (sold * dobandaLunara) / (1 - Math.pow(1 + dobandaLunara, -luni));
-    return rataFaraComision + comision;
+function actualizeazaRataCurenta() {
+  const p = parseFloat(soldCredit.value);
+  const d = parseFloat(dobanda.value);
+  const n = parseInt(perioadaRamasa.value);
+  const c = parseFloat(comisionLunar.value);
+
+  if ([p, d, n, c].some(x => isNaN(x) || x < 0) || n === 0) {
+    rataCurentaInput.value = "";
+    return;
   }
 
-  function actualizeazaRataCurenta() {
-    const p = parseFloat(soldCredit.value);
-    const d = parseFloat(dobanda.value);
-    const n = parseInt(perioadaRamasa.value);
-    const c = parseFloat(comisionLunar.value);
+  const rata = calculeazaRata(p, d, n, c);
+  rataCurentaInput.value = rata.toFixed(2);
+}
 
-    if ([p, d, n, c].some(x => isNaN(x) || x < 0) || n === 0) {
-      rataCurentaInput.value = "";
-      return;
-    }
+[soldCredit, dobanda, perioadaRamasa, comisionLunar].forEach(el => {
+  el.addEventListener("input", actualizeazaRataCurenta);
+});
 
-    const rata = calculeazaRata(p, d, n, c);
-    rataCurentaInput.value = rata.toFixed(2);
-  }
-
-  // Ascultă modificările pe toate inputurile relevante
-  [soldCredit, dobanda, perioadaRamasa, comisionLunar].forEach(el => {
-    el.addEventListener("input", actualizeazaRataCurenta);
-  });
-
-  // Apelează o dată la încărcare ca să afișeze rata inițială
-  actualizeazaRataCurenta();
+actualizeazaRataCurenta();
 </script>
+
+
 
   </body>
 </html>
